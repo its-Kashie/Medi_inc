@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Backend Core (Healthcare Operations)
+  postgres:
+    image: postgres:15-alpine
+    container_name: healthlink360_postgres
+    environment:
+      POSTGRES_DB: healthlink_core
+      POSTGRES_USER: healthlink_user
+      POSTGRES_PASSWORD: healthlink_pass_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - healthlink_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthlink_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB for Backend Reporting (Analytics & Research)
+  mongodb:
+    image: mongo:7.0
+    container_name: healthlink360_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: healthlink_admin
+      MONGO_INITDB_ROOT_PASSWORD: healthlink_mongo_2024
+      MONGO_INITDB_DATABASE: healthlink_reporting
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - healthlink_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Session Management & Caching
+  redis:
+    image: redis:7-alpine
+    container_name: healthlink360_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - healthlink_network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Core - Healthcare Operations
+  backend_core:
+    build:
+      context: .
+      dockerfile: backend_core/Dockerfile
+    container_name: healthlink360_backend_core
+    environment:
+      - DATABASE_URL=postgresql://healthlink_user:healthlink_pass_2024@postgres:5432/healthlink_core
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
+      - SECRET_KEY=your-secret-key-change-in-production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend_core:/app/backend_core
+      - ./shared:/app/shared
+      - ./logs:/app/logs
+    networks:
+      - healthlink_network
+    command: uvicorn backend_core.backend:app --host 0.0.0.0 --port 8000 --reload
+
+  # Backend Reporting - Analytics & Research
+  backend_reporting:
+    build:
+      context: .
+      dockerfile: backend_reporting/Dockerfile
+    container_name: healthlink360_backend_reporting
+    environment:
+      - MONGODB_URL=mongodb://healthlink_admin:healthlink_mongo_2024@mongodb:27017/healthlink_reporting?authSource=admin
+      - REDIS_URL=redis://redis:6379/1
+      - ENVIRONMENT=production
+      - SECRET_KEY=your-secret-key-change-in-production
+    ports:
+      - "8001:8001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend_reporting:/app/backend_reporting
+      - ./shared:/app/shared
+      - ./mcp_servers:/app/mcp_servers
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./generated_reports:/app/generated_reports
+    networks:
+      - healthlink_network
+    command: uvicorn backend_reporting.api_server:app --host 0.0.0.0 --port 8001 --reload
+
+  # Frontend - React Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: healthlink360_frontend
+    environment:
+      - REACT_APP_BACKEND_CORE_URL=http://localhost:8000
+      - REACT_APP_BACKEND_REPORTING_URL=http://localhost:8001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend_core
+      - backend_reporting
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - healthlink_network
+    command: npm start
+
+networks:
+  healthlink_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
