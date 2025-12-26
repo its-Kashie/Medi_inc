@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Core Framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -63,3 +64,76 @@ phonenumbers==8.13.27
 
 # MCP Server Support
 mcp==0.1.0
+=======
+# Core Web Framework
+fastapi
+uvicorn
+pydantic
+
+# Database
+pymongo
+motor
+
+# MCP & Agents
+mcp
+anthropic
+httpx
+
+# Data Processing
+pandas
+openpyxl
+xlrd
+
+# Document Generation
+python-docx
+python-pptx
+
+# Data Visualization
+matplotlib
+seaborn
+plotly
+
+# Email & Communication
+python-multipart
+aiosmtplib
+
+# Utilities
+python-dotenv
+requests
+aiofiles
+
+# Computer Vision (for waste analysis)
+opencv-python
+pillow
+
+# NLP & Text Processing
+nltk
+spacy
+
+# Math & Scientific Computing
+numpy
+scipy
+
+# Date & Time
+python-dateutil
+
+# Async Support
+asyncio
+aiohttp
+
+# Testing (optional)
+pytest
+pytest-asyncio
+
+# Logging & Monitoring
+loguru
+
+# JSON Processing
+jsonschema
+
+# WebSocket
+websockets
+
+# CORS
+fastapi-cors
+>>>>>>> 992b45244486bc25460fadb9d6c2907f2e8b75db
