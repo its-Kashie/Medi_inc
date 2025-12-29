@@ -9,34 +9,34 @@ from pydantic import BaseModel
 
 # ===== Import Real Agents (WITHOUT NIH & Research) =====
 try:
-    from tracking_agent import tracking_agent, redact_pii
-    from maternal_agent_with_mcp import maternal_agent
-    from mental_health_agent import mental_agent
-    from pharmacy_agent import pharmacy_agent
-    from criminal_agent import criminal_agent
-    from waste_agent import waste_agent
+    from hospital_agents.tracking_agent import tracking_agent, redact_pii
+    from hospital_agents.maternal_agent import maternal_agent
+    from hospital_agents.mental_health_agent import mental_agent
+    from hospital_agents.pharmacy_agent import pharmacy_agent
+    from hospital_agents.criminal_agent import criminal_agent
+    from hospital_agents.waste_agent import waste_agent
     from agents import Runner
 
     # Import MCPs for connection (WITHOUT NIH & Research)
-    from tracking_agent import orchestrator_mcp as tracking_orchestrator, domain_mcp as tracking_domain
-    from maternal_agent_with_mcp import orchestrator_mcp as maternal_orchestrator, domain_mcp as maternal_domain
-    from mental_health_agent import orchestrator_mcp as mental_orchestrator, domain_mcp as mental_domain
-    from pharmacy_agent import orchestrator_mcp as pharmacy_orchestrator, domain_mcp as pharmacy_domain
-    from criminal_agent import orchestrator_mcp as criminal_orchestrator, domain_mcp as criminal_domain
-    from waste_agent import orchestrator_mcp as waste_orchestrator, domain_mcp as waste_domain
+    from hospital_agents.tracking_agent import orchestrator_mcp as tracking_orchestrator, domain_mcp as tracking_domain
+    from hospital_agents.maternal_agent import orchestrator_mcp as maternal_orchestrator, domain_mcp as maternal_domain
+    from hospital_agents.mental_health_agent import orchestrator_mcp as mental_orchestrator, domain_mcp as mental_domain
+    from hospital_agents.pharmacy_agent import orchestrator_mcp as pharmacy_orchestrator, domain_mcp as pharmacy_domain
+    from hospital_agents.criminal_agent import orchestrator_mcp as criminal_orchestrator, domain_mcp as criminal_domain
+    from hospital_agents.waste_agent import orchestrator_mcp as waste_orchestrator, domain_mcp as waste_domain
 
     AGENTS_AVAILABLE = True
-    print("✅ Real agents imported successfully!")
+    print("✅ Real hospital_agents imported successfully!")
 
 except ImportError as e:
-    print(f"❌ Error importing agents: {e}")
+    print(f"❌ Error importing hospital_agents: {e}")
     print("⚠️  Make sure all agent files_should_be_in_1_directory are in the same directory")
     AGENTS_AVAILABLE = False
 
     # Fallback mock
     class MockAgent:
         async def run(self, query: str):
-            return f"Error: Real agents not available. {e}"
+            return f"Error: Real hospital_agents not available. {e}"
 
     tracking_agent = maternal_agent = mental_agent = pharmacy_agent = None
     criminal_agent = waste_agent = None
@@ -122,7 +122,7 @@ async def connect_all_mcps():
     global mcp_connected
 
     if not AGENTS_AVAILABLE:
-        print("⚠️  Skipping MCP connection - agents not available")
+        print("⚠️  Skipping MCP connection - hospital_agents not available")
         return
 
     mcp_pairs = [
@@ -154,6 +154,33 @@ async def connect_all_mcps():
 
     mcp_connected = True
     print("🎉 MCP connection complete!")
+# async def connect_all_mcps():
+#     """Connect all MCP servers (orchestrator + domain)"""
+#     global mcp_connected
+#
+#     if not AGENTS_AVAILABLE:
+#         print("⚠️  Skipping MCP connection - hospital_agents not available")
+#         return
+#
+#     mcp_pairs = [
+#         (tracking_orchestrator, tracking_domain, "Tracking"),
+#         (maternal_orchestrator, maternal_domain, "Maternal"),
+#         (mental_orchestrator, mental_domain, "Mental"),
+#         (pharmacy_orchestrator, pharmacy_domain, "Pharmacy"),
+#         (criminal_orchestrator, criminal_domain, "Criminal"),
+#         (waste_orchestrator, waste_domain, "Waste"),
+#     ]
+#
+#     for orch, dom, name in mcp_pairs:
+#         try:
+#             await orch.connect()
+#             await dom.connect()
+#             print(f"✅ {name} Agent MCPs connected")
+#         except Exception as e:
+#             print(f"⚠️  {name} Agent MCP connection failed: {e}")
+#
+#     mcp_connected = True
+#     print("🎉 All MCP servers connected successfully!")
 
 # ===== Helper Functions =====
 def add_trace(agent_id: str, trace_type: str, data: Dict):
@@ -210,9 +237,9 @@ async def root():
         "real_agents": AGENTS_AVAILABLE
     }
 
-@app.get("/api/agents")
+@app.get("/api/hospital_agents")
 async def get_agents():
-    """Get all available agents"""
+    """Get all available hospital_agents"""
     agents_info = []
     for agent_id, info in AGENTS.items():
         agents_info.append({
@@ -221,7 +248,7 @@ async def get_agents():
             "description": info["description"],
             "greeting": info["greeting"]
         })
-    return {"agents": agents_info}
+    return {"hospital_agents": agents_info}
 
 @app.get("/api/stats")
 async def get_stats():
@@ -270,7 +297,7 @@ async def chat_with_agent(message: ChatMessage):
         result = await Runner.run(agent, message.message)
         agent_response = result.final_output if hasattr(result, "final_output") else str(result)
 
-        # Apply privacy filter for sensitive agents
+        # Apply privacy filter for sensitive hospital_agents
         if message.agent_id in ["criminal", "tracking"]:
             agent_response = redact_pii(agent_response)
 
@@ -336,7 +363,7 @@ async def get_agent_traces(agent_id: str, limit: int = 50):
 
 @app.get("/api/traces")
 async def get_all_traces(limit: int = 100):
-    """Get all traces from all agents"""
+    """Get all traces from all hospital_agents"""
     all_traces = []
 
     for agent_id, traces in agent_traces.items():
@@ -615,6 +642,104 @@ class VideoAnalyzeRequest(BaseModel):
 
 
 @app.post("/api/analyze-video")
+# async def analyze_video_endpoint(request: VideoAnalyzeRequest):
+#     """Analyze uploaded video using Waste Agent"""
+#
+#     try:
+#         # ✅ VERIFY VIDEO EXISTS
+#         video_path = Path(request.video_path)
+#         if not video_path.exists():
+#             raise HTTPException(status_code=404, detail=f"Video not found: {request.video_path}")
+#
+#         print(f"\n{'=' * 60}")
+#         print(f"📹 Analyzing video: {request.video_path}")
+#
+#         # ✅ CALL WASTE AGENT
+#         message = ChatMessage(
+#             agent_id="waste",
+#             message=f"Analyze this video: {str(video_path.absolute())}. Use analyze_video_waste tool to get waste breakdown.",
+#             user_id="system"
+#         )
+#
+#         result = await chat_with_agent(message)
+#         agent_response = result.get("response", "")
+#
+#         print(f"🤖 Agent response length: {len(agent_response)}")
+#
+#         # ✅ EXTRACT JSON from agent response
+#         # Agent might wrap JSON in markdown or text
+#         import re
+#         import json
+#
+#         # Try to find JSON in response
+#         json_match = re.search(r'\{[\s\S]*\}', agent_response)
+#
+#         if json_match:
+#             json_str = json_match.group(0)
+#             try:
+#                 analysis_data = json.loads(json_str)
+#                 print(f"✅ Parsed analysis data: {list(analysis_data.keys())}")
+#             except json.JSONDecodeError:
+#                 print(f"⚠️  Failed to parse JSON, using raw response")
+#                 analysis_data = {
+#                     "video_path": str(video_path),
+#                     "raw_response": agent_response,
+#                     "waste_detected": {
+#                         "bio_medical": 0,
+#                         "sharps": 0,
+#                         "pharmaceutical": 0,
+#                         "placenta": 0,
+#                         "general": 0
+#                     }
+#                 }
+#         else:
+#             # No JSON found, create structured response
+#             print(f"⚠️  No JSON found in response")
+#             analysis_data = {
+#                 "video_path": str(video_path),
+#                 "raw_response": agent_response,
+#                 "waste_detected": {
+#                     "bio_medical": 15.0,
+#                     "sharps": 3.0,
+#                     "pharmaceutical": 2.0,
+#                     "placenta": 5.0,
+#                     "general": 10.0
+#                 },
+#                 "models_used": ["Placenta Detector", "Waste Classifier"],
+#                 "violations": []
+#             }
+#
+#         print(f"✅ Analysis complete")
+#         print(f"{'=' * 60}\n")
+#
+#         return {
+#             "status": "success",
+#             "analysis": analysis_data
+#         }
+#
+#     except Exception as e:
+#         print(f"❌ Analysis error: {e}")
+#         import traceback
+#         traceback.print_exc()
+#
+#         # Return structured error
+#         return {
+#             "status": "error",
+#             "error": str(e),
+#             "analysis": {
+#                 "video_path": request.video_path,
+#                 "error_message": str(e),
+#                 "waste_detected": {
+#                     "bio_medical": 0,
+#                     "sharps": 0,
+#                     "pharmaceutical": 0,
+#                     "placenta": 0,
+#                     "general": 0
+#                 }
+#             }
+#         }
+
+@app.post("/api/analyze-video")
 async def analyze_video_endpoint(request: VideoAnalyzeRequest):
     """Analyze uploaded video using Waste Agent"""
 
@@ -689,9 +814,7 @@ async def analyze_video_endpoint(request: VideoAnalyzeRequest):
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-from waste_agent import estimate_weight
-
-app = FastAPI(title="Hospital Waste Weight Estimator Demo")
+from hospital_agents.waste_agent import estimate_weight
 
 
 class VideoDetectionRequest(BaseModel):
@@ -708,13 +831,12 @@ async def estimate_weight_endpoint(request: VideoDetectionRequest):
         "status": "success",
         "estimated_weights": weights
     }
-
 # ===== Startup Event =====
 @app.on_event("startup")
 async def startup_event():
     """Initialize on startup"""
     print("🚀 HealthLink360 Backend Starting...")
-    print(f"✅ Loaded {len(AGENTS)} agents")
+    print(f"✅ Loaded {len(AGENTS)} hospital_agents")
 
     if AGENTS_AVAILABLE:
         print("🔌 Connecting MCP servers...")
@@ -725,11 +847,11 @@ async def startup_event():
             print(f"⚠️  MCP connection failed: {e}")
             print("⚠️  Agents will work but MCP features may be limited")
     else:
-        print("❌ Real agents not available - check imports")
+        print("❌ Real hospital_agents not available - check imports")
 
-    print("📡 Server ready at http://localhost:8000")
+    print("📡 Server ready at http://localhost0")
     print("📚 API Docs at http://localhost:8000/docs")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8009)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

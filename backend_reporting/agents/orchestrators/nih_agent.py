@@ -13,8 +13,8 @@
 # import os
 # import asyncio
 # from openai import AsyncOpenAI
-# from agents import Agent, Runner, OpenAIChatCompletionsModel
-# from agents.mcp import MCPServerStdio
+# from hospital_agents import Agent, Runner, OpenAIChatCompletionsModel
+# from hospital_agents.mcp import MCPServerStdio
 #
 # # ===== LOAD ENV =====
 # from dotenv import load_dotenv
@@ -612,7 +612,7 @@ gemini_model = OpenAIChatCompletionsModel(
 )
 
 # ===== MCP SERVERS =====
-# Core agents MCP
+# Core hospital_agents MCP
 agents_mcp = MCPServerStdio(
     params={"command": "python", "args": ["agents_mcp.py"]},
     cache_tools_list=True,

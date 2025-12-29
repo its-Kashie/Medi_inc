@@ -33,7 +33,7 @@ gemini_model = OpenAIChatCompletionsModel(
 )
 
 # ===== MCP SERVERS =====
-# Core agents MCP (tracking, maternal, pharmacy, etc.)
+# Core hospital_agents MCP (tracking, maternal, pharmacy, etc.)
 agents_mcp = MCPServerStdio(
     params={"command": "python", "args": ["agents_mcp.py"]},
     cache_tools_list=True,

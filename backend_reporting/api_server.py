@@ -127,9 +127,9 @@ try:
     from agents import Runner
 
     AGENTS_AVAILABLE = True
-    print("✅ Enhanced agents imported successfully!")
+    print("✅ Enhanced hospital_agents imported successfully!")
 except ImportError as e:
-    print(f"❌ Error importing agents: {e}")
+    print(f"❌ Error importing hospital_agents: {e}")
     AGENTS_AVAILABLE = False
 
 
@@ -161,7 +161,7 @@ async def lifespan(app: FastAPI):
     rnd_connected = await connect_mcp(rnd_mcp, "R&D MCP")
 
     if AGENTS_AVAILABLE:
-        print("🔗 Registering MCP sessions with agents...")
+        print("🔗 Registering MCP sessions with hospital_agents...")
         mcp_list = []
         if agents_connected: mcp_list.append(agents_mcp)
         if nih_connected: mcp_list.append(nih_mcp)
@@ -173,7 +173,7 @@ async def lifespan(app: FastAPI):
             hospital_central_agent.mcp_servers = mcp_list
             nih_agent.mcp_servers = mcp_list
             rnd_agent.mcp_servers = mcp_list
-            print(f"✅ All agents: {len(mcp_list)} MCP sessions registered")
+            print(f"✅ All hospital_agents: {len(mcp_list)} MCP sessions registered")
 
     print("🎉 Server startup complete!")
     yield
@@ -374,10 +374,10 @@ async def get_stats():
 
 
 # ===== AGENTS =====
-@app.get("/api/agents")
+@app.get("/api/hospital_agents")
 async def get_agents():
     return {
-        "agents": [
+        "hospital_agents": [
             {"id": "cardiology", "name": "Cardiology Agent", "status": "active", "department": "Cardiology"},
             {"id": "maternal_health", "name": "Maternal Health Agent", "status": "active", "department": "Obstetrics & Gynecology"},
             {"id": "infectious_diseases", "name": "Infectious Diseases Agent", "status": "active", "department": "Infectious Diseases"},
@@ -1123,7 +1123,7 @@ async def trigger_rnd_outreach():
     query = (
         f"Check tasks from NIH. "
         f"Send research collaboration emails to ALL universities. "
-        f"Use agents MCP tools."
+        f"Use hospital_agents MCP tools."
     )
 
     try:
@@ -1305,7 +1305,7 @@ if __name__ == "__main__":
     print("  POST /api/workflow/hospital-only")
     print("  POST /api/workflow/nih-aggregation")
     print("  POST /api/workflow/rnd-outreach")
-    print("  GET  /api/agents")
+    print("  GET  /api/hospital_agents")
     print("  GET  /api/traces")
     print("  GET  /api/reports/latest")
     print("\n🔧 MCP Servers:")

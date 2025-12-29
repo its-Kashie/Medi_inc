@@ -1,4 +1,3 @@
-
 # tracking_agent.py
 import asyncio
 import json
@@ -94,15 +93,6 @@ async def connect_mcp_with_fallback(mcp_server):
         print("📱 Degraded Mode: Using SMS fallback")
         return False
 
-# # ===== MCP SERVER CONNECTION =====
-# mcp_server = MCPServerStdio(
-#     params={
-#         "command": "python",
-#         "args": ["agents_mcp.py"]
-#     },
-#     cache_tools_list=True,
-#     name="TrackingMCP"
-# )
 
 # ===== MCP SERVERS (2 servers for inter-agent communication) =====
 
@@ -110,7 +100,7 @@ async def connect_mcp_with_fallback(mcp_server):
 orchestrator_mcp = MCPServerStdio(
     params={
         "command": "python",
-        "args": ["agent_orchestrator_mcp.py"]
+        "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py"]
     },
     cache_tools_list=True,
     name="OrchestratorMCP"
@@ -120,7 +110,7 @@ orchestrator_mcp = MCPServerStdio(
 domain_mcp = MCPServerStdio(
     params={
         "command": "python",
-        "args": ["agents_mcp.py"]
+        "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/core_agents_mcp/agents_mcp.py"]
     },
     cache_tools_list=True,
     name="DomainMCP"
@@ -157,7 +147,7 @@ tracking_agent = Agent(
 
         "STEP 1: CHECK INCOMING TASKS\n"
         "→ ALWAYS call check_my_tasks('tracking') at the START of every conversation\n"
-        "→ Process any pending handoffs from other agents BEFORE handling new user requests\n"
+        "→ Process any pending handoffs from other hospital_agents BEFORE handling new user requests\n"
         "→ If tasks found: complete them FIRST, then respond to user\n\n"
 
         "STEP 2: DETECT IF YOU NEED ANOTHER AGENT\n"
@@ -274,7 +264,7 @@ tracking_agent = Agent(
         "❌ DON'T:\n"
         "- Skip handoffs and try to handle pharmacy/maternal tasks yourself\n"
         "- Call pharmacy_request() directly - ALWAYS handoff to pharmacy agent\n"
-        "- Ignore pending tasks from other agents\n"
+        "- Ignore pending tasks from other hospital_agents\n"
         "- Share raw patient IDs or personal info\n"
         "- Respond without explaining reasoning\n\n"
 

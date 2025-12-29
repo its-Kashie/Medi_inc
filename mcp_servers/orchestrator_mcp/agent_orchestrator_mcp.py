@@ -187,7 +187,7 @@ def handoff_to_agent(
         Handoff confirmation with handoff_id
     """
 
-    # Validate agents
+    # Validate hospital_agents
     if to_agent not in AGENT_REGISTRY:
         return {
             "status": "error",
@@ -361,10 +361,10 @@ def query_agent_capabilities(agent_name: str) -> dict:
 @mcp.tool()
 def get_agent_status(agent_name: str = None) -> dict:
     """
-    📊 Get status of one or all agents
+    📊 Get status of one or all hospital_agents
 
     Args:
-        agent_name: Specific agent (None = all agents)
+        agent_name: Specific agent (None = all hospital_agents)
 
     Returns:
         Agent status information
@@ -379,11 +379,11 @@ def get_agent_status(agent_name: str = None) -> dict:
             **AGENT_REGISTRY[agent_name]
         }
 
-    # Return all agents
+    # Return all hospital_agents
     return {
         "total_agents": len(AGENT_REGISTRY),
         "active_agents": len([a for a in AGENT_REGISTRY.values() if a["status"] == "active"]),
-        "agents": AGENT_REGISTRY
+        "hospital_agents": AGENT_REGISTRY
     }
 
 
@@ -452,7 +452,7 @@ def broadcast_message(
         target_agents: list = None
 ) -> dict:
     """
-    📢 Broadcast message to multiple agents
+    📢 Broadcast message to multiple hospital_agents
 
     Args:
         from_agent: Source agent
@@ -523,12 +523,12 @@ def handoff_history_resource():
     }
 
 
-@mcp.resource("trace://orchestrator/agents")
+@mcp.resource("trace://orchestrator/hospital_agents")
 def agents_registry_resource():
     """👥 View agent registry"""
     return {
         "total_agents": len(AGENT_REGISTRY),
-        "agents": AGENT_REGISTRY
+        "hospital_agents": AGENT_REGISTRY
     }
 
 
