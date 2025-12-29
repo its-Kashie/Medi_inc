@@ -8,6 +8,9 @@ from openai import AsyncOpenAI
 from agents import Agent, Runner, OpenAIChatCompletionsModel
 from agents.mcp import MCPServerStdio
 
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+
+
 # ===== LOAD ENV =====
 from dotenv import load_dotenv
 load_dotenv()
@@ -100,7 +103,7 @@ async def connect_mcp_with_fallback(mcp_server):
 orchestrator_mcp = MCPServerStdio(
     params={
         "command": "python",
-        "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py"]
+        "args": [os.path.join(BASE_DIR, "mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py")]
     },
     cache_tools_list=True,
     name="OrchestratorMCP"
@@ -110,7 +113,7 @@ orchestrator_mcp = MCPServerStdio(
 domain_mcp = MCPServerStdio(
     params={
         "command": "python",
-        "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/core_agents_mcp/agents_mcp.py"]
+        "args": [os.path.join(BASE_DIR, "mcp_servers/core_agents_mcp/agents_mcp.py")]
     },
     cache_tools_list=True,
     name="DomainMCP"

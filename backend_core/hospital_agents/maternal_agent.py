@@ -5,6 +5,9 @@ from datetime import datetime
 from openai import AsyncOpenAI
 from agents import Agent, Runner, OpenAIChatCompletionsModel
 from agents.mcp import MCPServerStdio
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
 import io
@@ -38,13 +41,13 @@ gemini_model = OpenAIChatCompletionsModel(
 
 # ===== MCP SERVERS =====
 orchestrator_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py")]},
     cache_tools_list=True,
     name="OrchestratorMCP"
 )
 
 domain_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["/home/radeon/PycharmProjects/Medi_inc/mcp_servers/core_agents_mcp/agents_mcp.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/core_agents_mcp/agents_mcp.py")]},
     cache_tools_list=True,
     name="DomainMCP"
 )

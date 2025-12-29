@@ -34,13 +34,13 @@ def debug_log(msg):
 
 # ===== MCP SERVERS =====
 orchestrator_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["agent_orchestrator_mcp.py"]},
+    params={"command": "python", "args": ["mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py"]},
     cache_tools_list=True,
     name="OrchestratorMCP_ReportGen"
 )
 
 agents_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["agents_mcp.py"]},
+    params={"command": "python", "args": ["mcp_servers/core_agents_mcp/agents_mcp.py"]},
     cache_tools_list=True,
     name="AgentsMCP_ReportGen"
 )

@@ -12,6 +12,9 @@ import asyncio
 from openai import AsyncOpenAI
 from agents import Agent, Runner, OpenAIChatCompletionsModel
 from agents.mcp import MCPServerStdio
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+
 # ===== ADD THIS NEW LINE =====
 from agent_key_manager import apply_key_to_agent   # ← yehi line daal do
 # ===== LOAD ENV =====
@@ -35,28 +38,28 @@ gemini_model = OpenAIChatCompletionsModel(
 # ===== MCP SERVERS =====
 # Core hospital_agents MCP (tracking, maternal, pharmacy, etc.)
 agents_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["agents_mcp.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/core_agents_mcp/agents_mcp.py")]},
     cache_tools_list=True,
     name="CoreAgentsMCP"
 )
 
 # NIH MCP (national aggregation, 3-year trends)
 nih_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["nih_mcp.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/nih_mcp/nih_mcp.py")]},
     cache_tools_list=True,
     name="NIH_MCP"
 )
 
 # Orchestrator for inter-agent communication
 orchestrator_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["agent_orchestrator_mcp.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/orchestrator_mcp/agent_orchestrator_mcp.py")]},
     cache_tools_list=True,
     name="OrchestratorMCP"
 )
 
 # NEW: R&D-specific MCP (university emails, WHO proposals)
 rnd_mcp = MCPServerStdio(
-    params={"command": "python", "args": ["rnd_mcp_tools.py"]},
+    params={"command": "python", "args": [os.path.join(BASE_DIR, "mcp_servers/rnd_mcp/rnd_mcp_tools.py")]},
     cache_tools_list=True,
     name="RND_MCP"
 )

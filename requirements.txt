@@ -8,6 +8,8 @@ pymongo
 motor
 
 # MCP & Agents
+openai
+openai-agents
 mcp
 anthropic
 httpx
@@ -36,6 +38,8 @@ requests
 aiofiles
 
 # Computer Vision (for waste analysis)
+torch
+torchvision
 opencv-python
 pillow
 
