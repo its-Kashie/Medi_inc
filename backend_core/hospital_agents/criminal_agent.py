@@ -34,8 +34,12 @@ gemini_model = OpenAIChatCompletionsModel(
 )
 
 # ===== EMAIL CONFIG =====
-SENDER_EMAIL = "nooreasal786@gmail.com"
-APP_PASSWORD = "irph tole tuqr vfmi"
+SENDER_EMAIL = os.getenv("EMAIL_SENDER")
+APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD")
+
+if not SENDER_EMAIL or not APP_PASSWORD:
+    print("⚠️ Email credentials not found in .env, email features will be disabled.")
+
 
 
 def send_email_notification(receiver_email, subject, body):

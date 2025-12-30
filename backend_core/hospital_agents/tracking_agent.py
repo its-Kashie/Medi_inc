@@ -15,10 +15,10 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 from dotenv import load_dotenv
 load_dotenv()
 # ===== GEMINI SETUP =====
-GEMINI_API_KEY = 'AIzaSyD1th_cWcYwNbgpORO12Z3asJpQZ8_csSQ'
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# if not GEMINI_API_KEY:
-    # raise ValueError("❌ GEMINI_API_KEY not found in .env file!")
+if not GEMINI_API_KEY:
+    raise ValueError("❌ GEMINI_API_KEY not found in .env file!")
 
 client = AsyncOpenAI(
     api_key=GEMINI_API_KEY,
